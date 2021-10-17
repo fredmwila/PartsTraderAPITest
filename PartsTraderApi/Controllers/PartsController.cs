@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using PartsTraderApi.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,43 +18,55 @@ namespace PartsTraderApi.Controllers
     [Route("[controller]")]
     public class PartsController : ControllerBase
     {
+        private IConfiguration _configuration;
 
-
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+        private readonly PartsDbContext _context;
 
         private readonly ILogger<PartsController> _logger;
 
-        public PartsController(ILogger<PartsController> logger)
+        public PartsController(IConfiguration configuration, PartsDbContext context)
         {
-            _logger = logger;
+            _configuration = configuration;
+            _context = context;
         }
 
-        [HttpGet("Compatible/{partNumber}")]
+        [HttpGet("{partNumber}")]
         public async Task<ActionResult<IEnumerable<Part>>> GetCompatibleParts(string partNumber)
         {
             try
             {
                 var exceptions = new List<Exception>();
                 Dictionary<string, Part> excludedParts = new Dictionary<string, Part>();
+                //Validate Part Number
+                if (!PartNumberIsValid(partNumber)) exceptions.Add(new ArgumentException("The Part Number is an invalid format.It should use the following format: PartId(4xnumbers) +\"-\"+PartCode(4+ aplhanumeric) e.g 1234-a1b2c3d4"));
+
+                //Check Exclusions
+
                 using (StreamReader r = new StreamReader("Data/Exclusions.json"))
                 {
                     string json = r.ReadToEnd();
                     excludedParts = JsonConvert.DeserializeObject<List<Part>>(json).ToDictionary(p => p.partNumber, p => p);
                 }
 
-                if (!PartNumberIsValid(partNumber)) exceptions.Add(new ArgumentException("The Part Number is an invalid format.It should use the following format: PartId(4xnumbers) +\"-\"+PartCode(4+ aplhanumeric) e.g 1234-a1b2c3d4"));
                 if (excludedParts.ContainsKey(partNumber)) exceptions.Add(new ArgumentException("The Part Number is excluded"));
 
+                //Return Errors
                 if (exceptions.Any()) throw new AggregateException("Part Number is not valid", exceptions);
 
-                var parts = new List<Part>();
 
-                return parts;
+                //Get compatible Parts
+                var currentPart = await _context.Parts
+                                                .Where(p => p.partNumber == partNumber)
+                                                .SingleAsync();
+
+                var compatibleParts = await _context.Parts
+                                                    .Where(p => p.description == currentPart.description)
+                                                    .ToListAsync();
+
+
+                return compatibleParts;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
