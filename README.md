@@ -16,13 +16,16 @@ Parts are compatible on the assumption that compatible parts have the same descr
 
 
 API Link : https://partstraderapi20211018184223.azurewebsites.net/parts/
+
 -Part Numbers can be searched by adding to the above link
 
 
 FrontEnd Link :https://partstradertest.azurewebsites.net/
+
 - A frontend has been made to consume the above api.
 
 Parts in Database
+
 partNumber,Description
 1000-sbb1,Seat Belt
 1000-sbb2,Seat Belt
