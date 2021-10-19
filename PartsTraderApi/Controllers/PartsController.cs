@@ -22,46 +22,49 @@ namespace PartsTraderApi.Controllers
 
         private readonly PartsDbContext _context;
 
-        private readonly ILogger<PartsController> _logger;
-
         public PartsController(IConfiguration configuration, PartsDbContext context)
         {
             _configuration = configuration;
             _context = context;
         }
 
+
         [HttpGet("{partNumber}")]
         public async Task<ActionResult<IEnumerable<Part>>> GetCompatibleParts(string partNumber)
         {
+            partNumber = partNumber.ToLower();
             try
             {
                 var exceptions = new List<Exception>();
                 Dictionary<string, Part> excludedParts = new Dictionary<string, Part>();
+
                 //Validate Part Number
                 if (!PartNumberIsValid(partNumber)) exceptions.Add(new ArgumentException("The Part Number is an invalid format.It should use the following format: PartId(4xnumbers) +\"-\"+PartCode(4+ aplhanumeric) e.g 1234-a1b2c3d4"));
 
                 //Check Exclusions
-
                 using (StreamReader r = new StreamReader("Data/Exclusions.json"))
                 {
                     string json = r.ReadToEnd();
-                    excludedParts = JsonConvert.DeserializeObject<List<Part>>(json).ToDictionary(p => p.partNumber, p => p);
+                    excludedParts = JsonConvert.DeserializeObject<List<Part>>(json).ToDictionary(p => p.partNumber.ToLower(), p => p);
                 }
 
-                if (excludedParts.ContainsKey(partNumber)) exceptions.Add(new ArgumentException("The Part Number is excluded"));
+                if (excludedParts.ContainsKey(partNumber)) exceptions.Add(new ArgumentException("The Part Number \"" + partNumber + "\" is excluded."));
 
                 //Return Errors
-                if (exceptions.Any()) throw new AggregateException("Part Number is not valid", exceptions);
+                if (exceptions.Any()) throw new AggregateException("Part Number \"" + partNumber + "\" is not valid.", exceptions);
 
 
                 //Get compatible Parts
                 var currentPart = await _context.Parts
                                                 .Where(p => p.partNumber == partNumber)
-                                                .SingleAsync();
+                                                .FirstOrDefaultAsync();
+
+                if (currentPart == null) throw new ArgumentException("Part Number \"" + partNumber + "\" cannot be found.");
 
                 var compatibleParts = await _context.Parts
                                                     .Where(p => p.description == currentPart.description)
                                                     .ToListAsync();
+
 
 
                 return compatibleParts;
@@ -70,7 +73,6 @@ namespace PartsTraderApi.Controllers
             {
                 return BadRequest(e.Message);
             }
-
 
         }
     }

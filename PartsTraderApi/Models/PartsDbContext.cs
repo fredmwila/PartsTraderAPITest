@@ -15,10 +15,16 @@ namespace PartsTraderApi.Models
 
         public DbSet<Part> Parts { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Part>().ToTable("Parts");
         }
+
+
 
     }
 }

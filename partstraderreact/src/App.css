@@ -1,0 +1,83 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+h4 {
+  font-size:.8em;
+}
+
+p {
+  font-size:.7em;
+}
+
+.App-header {
+  background-color: #138ed5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.Search {
+  background-color: #ffffff91;
+  color: white !important;
+  padding: 2px;
+  border-radius: 5px;
+  margin-bottom:5px;
+}
+
+.SearchIcon {
+  height: 36px !important;
+  display: block !important;
+  float: left;
+  margin-right: 5px;
+}
+
+.Button {
+  background-color: #138ed5;
+    color: white;
+    border: white 2px solid;
+    border-radius: 5px;
+    animation: alternate-reverse;
+}
+
+.Button:hover {
+  background-color: white;
+  color:#138ed5;
+  border: #138ed5 2px solid;
+  cursor:pointer;
+}
+
+.GridItem {
+  margin:5px !important;
+  border: #ffffff6e 2px solid;
+  border-radius: 5px;
+}
+
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
