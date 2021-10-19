@@ -10,16 +10,13 @@ function App() {
   const [errorMessage,setErrorMessage] = useState("");
   const [partNumber,setPartNumber]=useState("");
 
-  console.log(partNumber);
-
       function getCompatibleParts(partNumber) {
         axios.get("https://partstraderapi20211018184223.azurewebsites.net/parts/"+partNumber)
           .then(response => {
             setErrorMessage("");
             setCompatibleParts(response.data);
-            console.log(response.data);
         })
-        .catch(error => {
+        .catch(error => { 
           setErrorMessage(error.response.data);
           setCompatibleParts([]);
         });
@@ -41,7 +38,6 @@ function App() {
             </h2> 
             <Grid container >
             {compatibleParts.map((part,index)=>{
-              console.log(part);
                   return (
                       <Grid item xs={3} key={index}>
                         <div className="GridItem">

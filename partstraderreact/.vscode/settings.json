@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/1edfccb0-68e2-4160-a683-8ec8469d31c9/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/PartsTraderTest",
+    "appService.deploySubpath": "build"
+}
